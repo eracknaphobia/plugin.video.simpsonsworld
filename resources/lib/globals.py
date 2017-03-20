@@ -20,11 +20,13 @@ RESOURCE_ID = "<rss version='2.0'><channel><title>fx</title></channel></rss>"
 UA_FX = 'FXNOW/562 CFNetwork/711.4.6 Darwin/14.0.0'
 
 #Add-on specific Adobepass variables
-SERVICE_VARS = {'requestor_id':'fx',
-                'public_key':'Dy1OhW3HrWk03QJrMMIULAmUdPQqk2Ds',
+SERVICE_VARS = {'app_version': 'Fire TV',
+                'device_type':'firetv',             
                 'private_key':'B081JNlGKn1ZqpQH',
-                'activate_url':'fxnetworks.com/activate'
-                'reg_body': '&appVersion=Fire TV&deviceType=firetv'
+                'public_key':'Dy1OhW3HrWk03QJrMMIULAmUdPQqk2Ds',
+                'registration_url':'fxnetworks.com/activate',
+                'requestor_id':'fx',
+                'resource_id':urllib.quote(RESOURCE_ID)
                }
 
 def listSeasons():   
@@ -54,7 +56,7 @@ def listEpisodes(season):
     
     for episode in reversed(json_source['videos']):            
         title = episode['name']
-        #Default video type
+        #Default video type is 16x9
         url = episode['video_urls']['16x9']['en_US']['video_url']         
         try: url = episode['video_urls'][RATIO]['en_US']['video_url']
         except: pass
@@ -76,42 +78,43 @@ def listEpisodes(season):
 
 def getStream(url):
     adobe = ADOBE(SERVICE_VARS)            
-    mvpd = adobe.authorizeDevice(RESOURCE_ID)        
-    media_token = adobe.mediaToken(RESOURCE_ID)          
-    
-    if media_token != '':
-        url = url + "&auth="+urllib.quote(base64.b64decode(media_token))
+    if adobe.checkAuthN():
+        if adobe.authorize():
+            media_token = adobe.mediaToken()       
+            url = url + "&auth="+urllib.quote(base64.b64decode(media_token))
+            req = urllib2.Request(url)
+            req.add_header("Accept", "*/*")
+            req.add_header("Accept-Encoding", "deflate")
+            req.add_header("Accept-Language", "en-us")
+            req.add_header("Connection", "keep-alive")        
+            req.add_header("User-Agent", UA_FX)
+            response = urllib2.urlopen(req)              
+            response.close() 
 
-        req = urllib2.Request(url)
-        req.add_header("Accept", "*/*")
-        req.add_header("Accept-Encoding", "deflate")
-        req.add_header("Accept-Language", "en-us")
-        req.add_header("Connection", "keep-alive")        
-        req.add_header("User-Agent", UA_FX)
-        response = urllib2.urlopen(req)              
-        response.close() 
-
-        '''
-        print source
-        start_str = '<video src="'
-        end_str = '"'
-        start = source.find(start_str)
-        end = source.find(end_str,start+len(start_str))
-        
-        stream_url = source[start+len(start_str):end]
-        '''
-        #get the last url forwarded to
-        stream_url = response.geturl()
-        stream_url = stream_url + '|User-Agent=okhttp/3.4.1'
-        
-        listitem = xbmcgui.ListItem(path=stream_url)
-        xbmcplugin.setResolvedUrl(addon_handle, True, listitem)    
+            #get the last url forwarded to
+            stream_url = response.geturl()
+            stream_url = stream_url + '|User-Agent=okhttp/3.4.1'            
+            listitem = xbmcgui.ListItem(path=stream_url)
+            xbmcplugin.setResolvedUrl(addon_handle, True, listitem)
+        else:
+            sys.exit()
     else:
-        msg = "Error Signing Stream"
+        msg = 'Your device\'s is not currently authorized to view the selected content.\n Would you like to authorize this device now?'
         dialog = xbmcgui.Dialog() 
-        ok = dialog.ok('Authentication Failure', msg)
+        answer = dialog.yesno('Device Not Authorized', msg)                 
+        if answer:
+            adobe.registerDevice()
+            getStream(url)
+        else:
+            sys.exit()
 
 
+def deauthorize():
+    adobe = ADOBE(SERVICE_VARS)
+    adobe.deauthorizeDevice()
+    dialog = xbmcgui.Dialog()      
+    dialog.notification('30900', '30901', '', 5000, False)  
+        
 
 def addEpisode(name,link_url,title,iconimage,fanart,info=None):
     ok=True

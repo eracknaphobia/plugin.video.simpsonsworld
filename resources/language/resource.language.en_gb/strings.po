@@ -21,7 +21,7 @@ msgid "The Simpsons"
 msgstr ""
 
 msgctxt "#30001"
-msgid "Stream Settings"
+msgid "General"
 msgstr ""
 
 msgctxt "#30002"
@@ -34,4 +34,16 @@ msgstr ""
 
 msgctxt "#30020"
 msgid "Audio Commentary"
+msgstr ""
+
+msgctxt "#30030"
+msgid "Deauthorize this Device"
+msgstr ""
+
+msgctxt "#30900"
+msgid "Deauthorizie Device"
+msgstr ""
+
+msgctxt "#30901"
+msgid "This device has been succesfully deauthorized."
 msgstr ""

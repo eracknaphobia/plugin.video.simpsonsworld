@@ -25,5 +25,7 @@ elif mode==101:
     listEpisodes(url)  
 elif mode==102:
     getStream(url)
+elif mode==999:
+	deauthorize()
 
 xbmcplugin.endOfDirectory(addon_handle)
