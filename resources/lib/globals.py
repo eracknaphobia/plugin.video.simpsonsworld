@@ -24,6 +24,7 @@ SERVICE_VARS = {'requestor_id':'fx',
                 'public_key':'Dy1OhW3HrWk03QJrMMIULAmUdPQqk2Ds',
                 'private_key':'B081JNlGKn1ZqpQH',
                 'activate_url':'fxnetworks.com/activate'
+                'reg_body': '&appVersion=Fire TV&deviceType=firetv'
                }
 
 def listSeasons():   
