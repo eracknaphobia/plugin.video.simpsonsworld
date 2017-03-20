@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="plugin.video.simpsonsworld" name="Simpsons World" version="2017.3.19" provider-name="eracknaphobia">
+  <requires>
+   <import addon="xbmc.python" version="2.25.0"/>             
+   <import addon="script.module.adobepass" version="2017.3.19"/>
+  </requires>
+  <extension point="xbmc.python.pluginsource" library="simpsons.py">
+        <provides>video</provides>
+  </extension>  
+  <extension point="xbmc.addon.metadata">    
+    <platform>all</platform>
+    <summary lang="en">Simpsons World</summary>
+    <description lang="en">Desc.</description>
+    <disclaimer lang="en"></disclaimer>
+    <language>en</language>
+    <platform>all</platform>
+    <license>GNU GENERAL PUBLIC LICENSE. Version 2, June 1991</license>
+    <forum></forum>
+    <website></website>
+    <email></email>
+    <source></source>
+  </extension>
+</addon>
