@@ -6,6 +6,7 @@ import base64
 from adobepass.adobe import ADOBE
 
 
+
 addon_handle = int(sys.argv[1])
 ADDON = xbmcaddon.Addon(id='plugin.video.simpsonsworld')
 ROOTDIR = ADDON.getAddonInfo('path')
@@ -15,6 +16,7 @@ ICON = ROOTDIR+"/resources/media/icon.png"
 #Addon Settings 
 RATIO = str(ADDON.getSetting(id="ratio"))
 COMMENTARY = str(ADDON.getSetting(id="commentary"))
+LOCAL_STRING = ADDON.getLocalizedString
 
 RESOURCE_ID = "<rss version='2.0'><channel><title>fx</title></channel></rss>"
 UA_FX = 'FXNOW/562 CFNetwork/711.4.6 Darwin/14.0.0'
@@ -29,13 +31,46 @@ SERVICE_VARS = {'app_version': 'Fire TV',
                 'resource_id':urllib.quote(RESOURCE_ID)
                }
 
+art_root = 'http://thetvdb.com/banners/seasons/'
+season_art = {'1':'71663-1-16.jpg',
+            '2':'71663-2-15.jpg',
+            '3':'71663-3-15.jpg',
+            '4':'71663-4-16.jpg',
+            '5':'71663-5-16.jpg',
+            '6':'71663-6-15.jpg',
+            '7':'71663-7-14.jpg',
+            '8':'71663-8-14.jpg',
+            '9':'71663-9-15.jpg',
+            '10':'71663-10-15.jpg',
+            '11':'71663-11-14.jpg',
+            '12':'71663-12-10.jpg',
+            '13':'71663-13-13.jpg',
+            '14':'71663-14-13.jpg',
+            '15':'71663-15-10.jpg',
+            '16':'71663-16-11.jpg',
+            '17':'71663-17-11.jpg',
+            '18':'71663-18-10.jpg',
+            '19':'71663-19-8.jpg',
+            '20':'71663-20-11.jpg',
+            '21':'71663-21-11.jpg',
+            '22':'71663-22-9.jpg',
+            '23':'71663-23-9.jpg',
+            '24':'71663-24-4.jpg',
+            '25':'71663-25-3.jpg',
+            '26':'71663-26.jpg',
+            '27':'71663-27-2.jpg',
+            '28':'71663-28.jpg',
+            }
+
+
 def listSeasons():   
     for x in range(1, 29):
         title = "Season "+str(x)
         url = str(x)
         #icon = 'http://thetvdb.com/banners/seasons/71663-'+str(x)+'-15.jpg'
         #icon = 'http://thetvdb.com/banners/seasonswide/71663-'+str(x)+'.jpg'        
-        icon = 'http://thetvdb.com/banners/seasons/71663-'+str(x)+'.jpg'
+        #icon = 'http://thetvdb.com/banners/seasons/71663-'+str(x)+'.jpg'
+        icon = art_root+season_art[str(x)]
 
         addSeason(title,url,101,icon,FANART)
 
@@ -70,7 +105,7 @@ def listEpisodes(season):
         season = str(episode['season']).zfill(2) 
         episode = str(episode['episode']).zfill(2)         
 
-        info = {'plot':desc,'tvshowtitle':'30000', 'season':season, 'episode':episode, 'title':title,'originaltitle':title,'duration':duration,'aired':aired,'genre':'30002'}
+        info = {'plot':desc,'tvshowtitle':LOCAL_STRING(30000), 'season':season, 'episode':episode, 'title':title,'originaltitle':title,'duration':duration,'aired':aired,'genre':LOCAL_STRING(30002)}
         
         addEpisode(title,url,title,icon,FANART,info)
 
@@ -99,9 +134,9 @@ def getStream(url):
         else:
             sys.exit()
     else:
-        msg = 'Your device\'s is not currently authorized to view the selected content.\n Would you like to authorize this device now?'
+        #msg = 'Your device\'s is not currently authorized to view the selected content.\n Would you like to authorize this device now?'
         dialog = xbmcgui.Dialog() 
-        answer = dialog.yesno('Device Not Authorized', msg)                 
+        answer = dialog.yesno(LOCAL_STRING(30911), LOCAL_STRING(30910))
         if answer:
             adobe.registerDevice()
             getStream(url)
@@ -113,7 +148,7 @@ def deauthorize():
     adobe = ADOBE(SERVICE_VARS)
     adobe.deauthorizeDevice()
     dialog = xbmcgui.Dialog()      
-    dialog.notification('30900', '30901', '', 5000, False)  
+    dialog.notification(LOCAL_STRING(30900), LOCAL_STRING(30901), '', 5000, False)  
         
 
 def addEpisode(name,link_url,title,iconimage,fanart,info=None):

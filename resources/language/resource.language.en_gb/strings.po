@@ -36,14 +36,18 @@ msgctxt "#30020"
 msgid "Audio Commentary"
 msgstr ""
 
-msgctxt "#30030"
-msgid "Deauthorize this Device"
-msgstr ""
-
 msgctxt "#30900"
 msgid "Deauthorizie Device"
 msgstr ""
 
 msgctxt "#30901"
 msgid "This device has been succesfully deauthorized."
+msgstr ""
+
+msgctxt "#30910"
+msgid "Your device is not currently authorized to view the selected content.\n Would you like to authorize this device now?"
+msgstr ""
+
+msgctxt "#30911"
+msgid "Device Not Authorized"
 msgstr ""
