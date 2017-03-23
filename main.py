@@ -1,12 +1,12 @@
 from resources.lib.globals import *
 
 params=get_params()
-url=None
+media_id=None
 name=None
 mode=None
 
 try:
-    url=urllib.unquote_plus(params["url"])
+    curation_id=urllib.unquote_plus(params["id"])
 except:
     pass
 try:
@@ -19,12 +19,13 @@ except:
     pass
 
 
-if mode==None or url==None or len(url)<1:                    
-    listSeasons()
+if mode==None:                    
+    #or url==None or len(url)<1
+    mainMenu()
 elif mode==101:
-    listEpisodes(url)  
+    listMovies()  
 elif mode==102:
-    getStream(url)
+    getStream(curation_id)
 elif mode==999:
 	deauthorize()
 
