@@ -10,10 +10,9 @@ from adobepass.adobe import ADOBE
 addon_handle = int(sys.argv[1])
 ADDON = xbmcaddon.Addon()
 ROOTDIR = ADDON.getAddonInfo('path')
-#FANART = ROOTDIR+"/resources/media/fanart.jpg"
-FANART = os.path.join(ROOTDIR,"resources","media","fanart.jpg")
-#ICON = ROOTDIR+"/resources/media/icon.png"
-ICON = os.path.join(ROOTDIR,"resources","media","icon.png")
+
+FANART = os.path.join(ROOTDIR,"resources/media/fanart.jpg")
+ICON = os.path.join(ROOTDIR,"resources/media/icon.png")
 
 
 #Addon Settings 
