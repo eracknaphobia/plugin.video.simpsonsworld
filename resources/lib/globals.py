@@ -3,70 +3,76 @@ import xbmc, xbmcplugin, xbmcgui, xbmcaddon
 import urllib, urllib2
 import json
 import base64
+from adobepass.adobe import ADOBE
 
 
 
 addon_handle = int(sys.argv[1])
-ADDON = xbmcaddon.Addon(id='plugin.video.crackle')
+ADDON = xbmcaddon.Addon(id='plugin.video.simpsonsworld')
 ROOTDIR = ADDON.getAddonInfo('path')
 FANART = ROOTDIR+"/resources/media/fanart.jpg"
 ICON = ROOTDIR+"/resources/media/icon.png"
 
 #Addon Settings 
+RATIO = str(ADDON.getSetting(id="ratio"))
+COMMENTARY = str(ADDON.getSetting(id="commentary"))
 LOCAL_STRING = ADDON.getLocalizedString
-UA_CRACKLE = 'Crackle/7.60 CFNetwork/808.3 Darwin/16.3.0'
 
-def mainMenu():    
-    addDir('Movies','/movies',101,ICON)
-    addDir('TV','/tv',102,ICON)
+RESOURCE_ID = "<rss version='2.0'><channel><title>fx</title></channel></rss>"
+UA_FX = 'FXNOW/562 CFNetwork/711.4.6 Darwin/14.0.0'
+
+#Add-on specific Adobepass variables
+SERVICE_VARS = {'app_version': 'Fire TV',
+                'device_type':'firetv',             
+                'private_key':'B081JNlGKn1ZqpQH',
+                'public_key':'Dy1OhW3HrWk03QJrMMIULAmUdPQqk2Ds',
+                'registration_url':'fxnetworks.com/activate',
+                'requestor_id':'fx',
+                'resource_id':urllib.quote(RESOURCE_ID)
+               }
+
+art_root = 'http://thetvdb.com/banners/seasons/'
+season_art = {'1':'71663-1-16.jpg',
+            '2':'71663-2-15.jpg',
+            '3':'71663-3-15.jpg',
+            '4':'71663-4-16.jpg',
+            '5':'71663-5-16.jpg',
+            '6':'71663-6-15.jpg',
+            '7':'71663-7-14.jpg',
+            '8':'71663-8-14.jpg',
+            '9':'71663-9-15.jpg',
+            '10':'71663-10-15.jpg',
+            '11':'71663-11-14.jpg',
+            '12':'71663-12-10.jpg',
+            '13':'71663-13-13.jpg',
+            '14':'71663-14-13.jpg',
+            '15':'71663-15-10.jpg',
+            '16':'71663-16-11.jpg',
+            '17':'71663-17-11.jpg',
+            '18':'71663-18-10.jpg',
+            '19':'71663-19-8.jpg',
+            '20':'71663-20-11.jpg',
+            '21':'71663-21-11.jpg',
+            '22':'71663-22-9.jpg',
+            '23':'71663-23-9.jpg',
+            '24':'71663-24-4.jpg',
+            '25':'71663-25-3.jpg',
+            '26':'71663-26.jpg',
+            '27':'71663-27-2.jpg',
+            '28':'71663-28.jpg',
+            }
 
 
-def listMovies():       
-    '''
-    GET https://ios-api-us.crackle.com/Service.svc/browse/movies/full/all/alpha-asc/US?pageSize=24&pageNumber=1&format=json HTTP/1.1
-    Host: ios-api-us.crackle.com
-    Accept: */*
-    Connection: keep-alive
-    If-None-Match: "6a673366-2e5e-493e-98ae-28ead1f5b50e"
-    Cookie: GR=348
-    Accept-Language: en-us
-    Authorization: 0C67DB845C62EB7437EF00F68376CE784A382046|201703231633|22|1
-    Accept-Encoding: gzip, deflate
-    User-Agent: Crackle/7.60 CFNetwork/808.3 Darwin/16.3.0
-    '''
-    url = 'http://ios-api-us.crackle.com/Service.svc/browse/movies/full/all/alpha-asc/US'
-    url += '?pageSize=500'
-    url += '&pageNumber=1'
-    url += '&format=json'
-    req = urllib2.Request(url)
-    req.add_header("Connection", "keep-alive")
-    req.add_header("Accept", "*/*")
-    req.add_header("Accept-Encoding", "deflate")
-    req.add_header("Accept-Language", "en-us")
-    req.add_header("Connection", "keep-alive")    
-    req.add_header("User-Agent", UA_CRACKLE)
-    response = urllib2.urlopen(req)   
-    json_source = json.load(response)                       
-    response.close() 
-    
+def listSeasons():   
+    for x in range(1, 29):
+        title = "Season "+str(x)
+        url = str(x)
+        #icon = 'http://thetvdb.com/banners/seasons/71663-'+str(x)+'-15.jpg'
+        #icon = 'http://thetvdb.com/banners/seasonswide/71663-'+str(x)+'.jpg'        
+        #icon = 'http://thetvdb.com/banners/seasons/71663-'+str(x)+'.jpg'
+        icon = art_root+season_art[str(x)]
 
-    for movie in json_source['Entries']:        
-        title = movie['Title']
-        url = str(movie['ID'])
-        icon = movie['ChannelArtTileLarge']
-        fanart = movie['Images']['Img_1920x1080']
-        info = None
-        info = {'plot':movie['Description'],
-                'genre':movie['Genre'], 
-                'year':movie['ReleaseYear'], 
-                'mpaa':movie['Rating'], 
-                'title':title,
-                'originaltitle':title,
-                'duration':movie['DurationInSeconds']
-                }
-
-        addStream(title,url,'movies',icon,fanart,info)
-
+        addSeason(title,url,101,icon,FANART)
 
 
 def listEpisodes(season):    
@@ -105,92 +111,70 @@ def listEpisodes(season):
 
 
 
-def getStream(curation_id):
-    '''
-    GET https://ios-api-us.crackle.com/Service.svc/curation/30534/US?format=json HTTP/1.1
-    Host: ios-api-us.crackle.com
-    Accept: */*
-    Connection: keep-alive
-    If-None-Match: "41776591-3885-408a-a4ee-020a80c84025"
-    Cookie: GR=348
-    Accept-Language: en-us
-    Authorization: 6C34892ACD3B811EA91807E07BE7046E19DAA9D7|201703232017|22|1
-    Accept-Encoding: gzip, deflate
-    User-Agent: Crackle/7.60 CFNetwork/808.3 Darwin/16.3.0
-    '''
-    url = 'http://ios-api-us.crackle.com/Service.svc/curation/'+curation_id+'/US' 
-    url += '?format=json'
-    
-    req = urllib2.Request(url)
-    req.add_header("Accept", "*/*")
-    req.add_header("Accept-Encoding", "deflate")
-    req.add_header("Accept-Language", "en-us")
-    req.add_header("Connection", "keep-alive")        
-    req.add_header("User-Agent", UA_CRACKLE)
-    response = urllib2.urlopen(req)   
-    json_source = json.load(response)                       
-    response.close()  
-    media_id = json_source['Result']['Items'][0]['MediaInfo']['Id']
-    '''
-    GET https://ios-api-us.crackle.com/Service.svc/details/media/2489564/US?format=json HTTP/1.1
-    Host: ios-api-us.crackle.com
-    Connection: keep-alive
-    Accept: */*
-    User-Agent: Crackle/7.60 CFNetwork/808.3 Darwin/16.3.0
-    Accept-Language: en-us
-    Authorization: 127DE6571887D314D5BF86EC39DABA4B7CB2C80B|201703231759|22|1
-    Accept-Encoding: gzip, deflate
-    '''
-    #url = 'http://ios-api-us.crackle.com/Service.svc/details/media/2489564/US'    
-    url = 'http://ios-api-us.crackle.com/Service.svc/details/media/'+media_id+'/US'  
-    url += '?format=json'
-    
-    req = urllib2.Request(url)
-    req.add_header("Accept", "*/*")
-    req.add_header("Accept-Encoding", "deflate")
-    req.add_header("Accept-Language", "en-us")
-    req.add_header("Connection", "keep-alive")        
-    req.add_header("User-Agent", UA_CRACKLE)
-    response = urllib2.urlopen(req)   
-    json_source = json.load(response)                       
-    response.close()  
+def getStream(url):
+    adobe = ADOBE(SERVICE_VARS)            
+    if adobe.checkAuthN():
+        if adobe.authorize():
+            media_token = adobe.mediaToken()       
+            url = url + "&auth="+urllib.quote(base64.b64decode(media_token))
+            req = urllib2.Request(url)
+            req.add_header("Accept", "*/*")
+            req.add_header("Accept-Encoding", "deflate")
+            req.add_header("Accept-Language", "en-us")
+            req.add_header("Connection", "keep-alive")        
+            req.add_header("User-Agent", UA_FX)
+            response = urllib2.urlopen(req)              
+            response.close() 
 
-    
-    for stream in json_source['MediaURLs']:
-        if 'AppleTV' in stream['Type']:
-            stream_url = stream['Path']
-            stream_url = stream_url[0:stream_url.index('.m3u8')]+'.m3u8'
-            break
+            #get the last url forwarded to
+            stream_url = response.geturl()
+            stream_url = stream_url + '|User-Agent=okhttp/3.4.1'            
+            listitem = xbmcgui.ListItem(path=stream_url)
+            xbmcplugin.setResolvedUrl(addon_handle, True, listitem)
+        else:
+            sys.exit()
+    else:
+        #msg = 'Your device\'s is not currently authorized to view the selected content.\n Would you like to authorize this device now?'
+        dialog = xbmcgui.Dialog() 
+        answer = dialog.yesno(LOCAL_STRING(30911), LOCAL_STRING(30910))
+        if answer:
+            adobe.registerDevice()
+            getStream(url)
+        else:
+            sys.exit()
 
-    stream_url += '|User-Agent='+UA_CRACKLE
-    listitem = xbmcgui.ListItem(path=stream_url)
-    xbmcplugin.setResolvedUrl(addon_handle, True, listitem)
+
+def deauthorize():
+    adobe = ADOBE(SERVICE_VARS)
+    adobe.deauthorizeDevice()
+    dialog = xbmcgui.Dialog()      
+    dialog.notification(LOCAL_STRING(30900), LOCAL_STRING(30901), '', 5000, False)  
         
 
-
-def addStream(name, link_url, stream_type, icon,fanart,info=None):
+def addEpisode(name,link_url,title,iconimage,fanart,info=None):
     ok=True
-    u=sys.argv[0]+"?id="+urllib.quote_plus(link_url)+"&mode="+str(102)
+    u=sys.argv[0]+"?url="+urllib.quote_plus(link_url)+"&mode="+str(102)
     liz=xbmcgui.ListItem(name)
-    liz.setArt({'icon': ICON, 'thumb': icon, 'fanart': fanart})    
+    liz.setArt({'icon': ICON, 'thumb': iconimage, 'fanart': fanart})    
     liz.setProperty("IsPlayable", "true")
-    liz.setInfo( type="Video", infoLabels={ "Title": name } )
+    liz.setInfo( type="Video", infoLabels={ "Title": title } )
     if info != None:
         liz.setInfo( type="Video", infoLabels=info) 
-    ok=xbmcplugin.addDirectoryItem(handle=addon_handle,url=u,listitem=liz,isFolder=False)
-    xbmcplugin.setContent(addon_handle, stream_type)    
+    ok=xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=u,listitem=liz,isFolder=False)
+    xbmcplugin.setContent(addon_handle, 'episodes')    
     return ok
 
 
-def addDir(name,url,mode,iconimage,fanart=None,info=None): 
+def addSeason(name,url,mode,iconimage,fanart=None,info=None): 
     params = get_params()      
     ok=True    
     u=sys.argv[0]+"?url="+urllib.quote_plus(url)+"&mode="+str(mode)+"&name="+urllib.quote_plus(name)
     liz=xbmcgui.ListItem(name)
-    liz.setArt({'icon': ICON, 'thumb': iconimage, 'fanart': fanart})    
+    liz.setArt({'icon': ICON, 'thumb': iconimage, 'fanart': fanart})
+    liz.setInfo( type="Video", infoLabels={ "Title": name, 'tvdb_id': '71663' } )
     if info != None:
         liz.setInfo( type="Video", infoLabels=info)     
-    ok=xbmcplugin.addDirectoryItem(handle=addon_handle,url=u,listitem=liz,isFolder=True)    
+    ok=xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=u,listitem=liz,isFolder=True)    
     xbmcplugin.setContent(addon_handle, 'tvshows')
     return ok
 
