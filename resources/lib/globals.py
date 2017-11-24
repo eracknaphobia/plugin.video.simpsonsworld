@@ -62,11 +62,12 @@ season_art = {'1':'71663-1-16.jpg',
             '26':'71663-26.jpg',
             '27':'71663-27-2.jpg',
             '28':'71663-28.jpg',
+            '29':'71663-29-3.jpg'
             }
 
 
 def listSeasons():       
-    for x in range(1, 29):
+    for x in range(1, 30):
         title = "Season "+str(x)
         url = str(x)
         #icon = 'http://thetvdb.com/banners/seasons/71663-'+str(x)+'-15.jpg'
