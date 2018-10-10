@@ -120,9 +120,9 @@ def listEpisodes(season):
 
 def getStream(url):
     adobe = ADOBE(SERVICE_VARS)            
-    if adobe.checkAuthN():
+    if adobe.check_authn():
         if adobe.authorize():
-            media_token = adobe.mediaToken()       
+            media_token = adobe.media_token()       
             url = url + "&auth="+urllib.quote(base64.b64decode(media_token))
 
             headers = {
@@ -147,7 +147,7 @@ def getStream(url):
         dialog = xbmcgui.Dialog() 
         answer = dialog.yesno(LOCAL_STRING(30911), LOCAL_STRING(30910))
         if answer:
-            adobe.registerDevice()
+            adobe.register_device()
             getStream(url)
         else:
             sys.exit()
@@ -155,7 +155,7 @@ def getStream(url):
 
 def deauthorize():
     adobe = ADOBE(SERVICE_VARS)
-    adobe.deauthorizeDevice()
+    adobe.logout()
     dialog = xbmcgui.Dialog()      
     dialog.notification(LOCAL_STRING(30900), LOCAL_STRING(30901), '', 5000, False)  
         
