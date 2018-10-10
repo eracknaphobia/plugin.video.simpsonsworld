@@ -9,8 +9,8 @@ addon_handle = int(sys.argv[1])
 ADDON = xbmcaddon.Addon()
 ROOTDIR = ADDON.getAddonInfo('path')
 
-FANART = os.path.join(ROOTDIR, "resources/media/fanart.jpg")
-ICON = os.path.join(ROOTDIR, "resources/media/icon.png")
+FANART = os.path.join(ROOTDIR, "resources", "media", "fanart.jpg")
+ICON = os.path.join(ROOTDIR, "resources", "media", "icon.png")
 VERIFY = False
 
 # Addon Settings
