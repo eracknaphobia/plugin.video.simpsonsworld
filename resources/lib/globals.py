@@ -3,6 +3,7 @@ import xbmc, xbmcplugin, xbmcgui, xbmcaddon
 import urllib
 import base64
 import requests
+import random
 from adobepass.adobe import ADOBE
 
 addon_handle = int(sys.argv[1])
@@ -66,11 +67,59 @@ season_art = {'1': '71663-1-16.jpg',
 
 
 def listSeasons():
+    findRandomEpisode()
     for x in range(1, 31):
         title = "Season " + str(x)
         url = str(x)
         icon = art_root + season_art[str(x)]
         addSeason(title, url, 101, icon, FANART)
+
+def findRandomEpisode():
+    #Get a random season
+    season=random.randint(1,30)
+    sURL = "http://fapi2.fxnetworks.com/androidtv/videos?filter%5Bfapi_show_id%5D=9aad7da1-093f-40f5-b371-fec4122f0d86" \
+          "&filter%5Bseason%5D=" + str(season) + "&limit=500&filter%5Btype%5D=episode"
+
+    headers = {
+        "Connection": "keep-alive",
+        "Accept": "*/*",
+        "Accept-Encoding": "deflate",
+        "Accept-Language": "en-us",
+        "Connection": "keep-alive",
+        "Authentication": "androidtv:a4y4o0e01jh27dsyrrgpvo6d1wvpravc2c4szpp4",
+        "User-Agent": UA_FX,
+    }
+
+    r = requests.get(sURL, headers=headers, verify=VERIFY)
+    json_source = r.json()
+
+    episodeList = sorted(json_source['videos'], key=lambda k: k['episode'])
+    # Get a random episode from that season
+    elen = len(episodeList)
+    elen -= 1
+    enum = random.randint(1, elen)
+
+    # Default video type is 16x9
+    url = episodeList[enum]['video_urls']['16x9']['en_US']['video_url']
+    try:
+        url = episodeList[enum]['video_urls'][RATIO]['en_US']['video_url']
+    except:
+        pass
+    if COMMENTARY == 'true':
+        try:
+            url = episodeList[enum]['video_urls'][RATIO]['en_US']['video_url_commentary']
+        except:
+            pass
+    title = episodeList[enum]['name']
+    desc = episodeList[enum]['description']
+    duration = episodeList[enum]['duration']
+    aired = episodeList[enum]['airDate']
+    episode = str(episodeList[enum]['episode']).zfill(2)
+
+    info = {'plot': desc, 'tvshowtitle': LOCAL_STRING(30000), 'season': season, 'episode': episode, 'title': title,
+            'originaltitle': title, 'duration': duration, 'aired': aired, 'genre': LOCAL_STRING(30002)}
+
+    addEpisode("Random[CR]Episode", url, title, 'https://www.thetvdb.com/banners/posters/71663-32.jpg', FANART, info)
 
 
 def listEpisodes(season):
@@ -139,6 +188,8 @@ def getStream(url):
             stream_url = stream_url + '|User-Agent=okhttp/3.4.1'
             listitem = xbmcgui.ListItem(path=stream_url)
             xbmcplugin.setResolvedUrl(addon_handle, True, listitem)
+            #load a new random episode for when the user returns to the menu
+            listSeasons()
         else:
             sys.exit()
     else:
