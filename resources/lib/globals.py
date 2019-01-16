@@ -65,10 +65,14 @@ season_art = {'1': '71663-1-16.jpg',
               '30': '5bb070d688a18.jpg'
               }
 
+min_season = 1
+max_season = 31
+
+
 
 def listSeasons():
-    findRandomEpisode()
-    for x in range(1, 31):
+    addEpisode("Random[CR]Episode", str(0), "Random[CR]Episode", 'https://www.thetvdb.com/banners/posters/71663-32.jpg', FANART, None, 103)
+    for x in range(min_season, max_season):
         title = "Season " + str(x)
         url = str(x)
         icon = art_root + season_art[str(x)]
@@ -76,7 +80,7 @@ def listSeasons():
 
 def findRandomEpisode():
     #Get a random season
-    season=random.randint(1,30)
+    season=random.randint(min_season, max_season)
     sURL = "http://fapi2.fxnetworks.com/androidtv/videos?filter%5Bfapi_show_id%5D=9aad7da1-093f-40f5-b371-fec4122f0d86" \
           "&filter%5Bseason%5D=" + str(season) + "&limit=500&filter%5Btype%5D=episode"
 
@@ -110,16 +114,11 @@ def findRandomEpisode():
             url = episodeList[enum]['video_urls'][RATIO]['en_US']['video_url_commentary']
         except:
             pass
-    title = episodeList[enum]['name']
-    desc = episodeList[enum]['description']
-    duration = episodeList[enum]['duration']
-    aired = episodeList[enum]['airDate']
-    episode = str(episodeList[enum]['episode']).zfill(2)
 
-    info = {'plot': desc, 'tvshowtitle': LOCAL_STRING(30000), 'season': season, 'episode': episode, 'title': title,
-            'originaltitle': title, 'duration': duration, 'aired': aired, 'genre': LOCAL_STRING(30002)}
+    info = {'plot': episodeList[enum]['description'], 'tvshowtitle': LOCAL_STRING(30000), 'season': season, 'episode': str(episodeList[enum]['episode']).zfill(2), 'title': episodeList[enum]['name'],
+            'originaltitle': episodeList[enum]['name'], 'duration': episodeList[enum]['duration'], 'aired': episodeList[enum]['airDate'], 'genre': LOCAL_STRING(30002)}
 
-    addEpisode("Random[CR]Episode", url, title, 'https://www.thetvdb.com/banners/posters/71663-32.jpg', FANART, info)
+    getStream(url, info)
 
 
 def listEpisodes(season):
@@ -166,7 +165,7 @@ def listEpisodes(season):
         addEpisode(title, url, title, icon, FANART, info)
 
 
-def getStream(url):
+def getStream(url, INFO=None):
     adobe = ADOBE(SERVICE_VARS)
     if adobe.check_authn():
         if adobe.authorize():
@@ -187,9 +186,12 @@ def getStream(url):
             stream_url = r.url
             stream_url = stream_url + '|User-Agent=okhttp/3.4.1'
             listitem = xbmcgui.ListItem(path=stream_url)
+            if INFO != None:
+                listitem.setInfo(type='Video', infoLabels=INFO)
+                listitem.setProperty('TotalTime', '0')
+                listitem.setProperty('ResumeTime', '0')
+                listitem.setProperty('startoffset','0')
             xbmcplugin.setResolvedUrl(addon_handle, True, listitem)
-            #load a new random episode for when the user returns to the menu
-            listSeasons()
         else:
             sys.exit()
     else:
@@ -197,7 +199,7 @@ def getStream(url):
         answer = dialog.yesno(LOCAL_STRING(30911), LOCAL_STRING(30910))
         if answer:
             adobe.register_device()
-            getStream(url)
+            getStream(url, INFO)
         else:
             sys.exit()
 
@@ -209,15 +211,18 @@ def deauthorize():
     dialog.notification(LOCAL_STRING(30900), LOCAL_STRING(30901), '', 5000, False)
 
 
-def addEpisode(name, link_url, title, iconimage, fanart, info=None):
+def addEpisode(name, link_url, title, iconimage, fanart, info=None, mode=102):
     ok = True
-    u = sys.argv[0] + "?url=" + urllib.quote_plus(link_url) + "&mode=" + str(102)
+    u = sys.argv[0] + "?url=" + urllib.quote_plus(link_url) + "&mode=" + str(mode)
     liz = xbmcgui.ListItem(name)
     liz.setArt({'icon': ICON, 'thumb': iconimage, 'fanart': fanart})
     liz.setProperty("IsPlayable", "true")
     liz.setInfo(type="Video", infoLabels={"Title": title, 'mediatype': 'episode'})
     if info != None:
         liz.setInfo(type="Video", infoLabels=info)
+    liz.setProperty('TotalTime', '0')
+    liz.setProperty('ResumeTime', '0')
+    liz.setProperty('startoffset','0')
     ok = xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=u, listitem=liz, isFolder=False)
     xbmcplugin.setContent(addon_handle, 'tvshows')
     return ok

@@ -17,9 +17,11 @@ if 'mode' in params:
 if mode is None or url is None or len(url)<1:
     listSeasons()
 elif mode == 101:
-    listEpisodes(url)  
+    listEpisodes(url)
 elif mode == 102:
     getStream(url)
+elif mode == 103:
+    findRandomEpisode()
 elif mode == 999:
     deauthorize()
 
