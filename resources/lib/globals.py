@@ -189,9 +189,6 @@ def get_stream(url, INFO=None):
 
             stream_url = r.url
             stream_url = stream_url + '|User-Agent=okhttp/3.4.1'
-            listitem = xbmcgui.ListItem(path=stream_url)
-            if INFO is not None:
-                listitem.setInfo(type='Video', infoLabels=INFO)
 
             if xbmc.getCondVisibility('System.HasAddon(inputstream.adaptive)') and INPUTSTREAM_ENABLED == 'true':
                 listitem = xbmcgui.ListItem(path=stream_url.split("|")[0])
@@ -202,6 +199,9 @@ def get_stream(url, INFO=None):
             else:
                 listitem = xbmcgui.ListItem(path=stream_url)
                 listitem.setMimeType("application/x-mpegURL")
+
+            if INFO is not None:
+                listitem.setInfo(type='Video', infoLabels=INFO)
 
             xbmcplugin.setResolvedUrl(addon_handle, True, listitem)
         else:
