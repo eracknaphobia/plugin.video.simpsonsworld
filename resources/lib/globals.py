@@ -19,6 +19,7 @@ RATIO = str(ADDON.getSetting(id="ratio"))
 COMMENTARY = str(ADDON.getSetting(id="commentary"))
 LOCAL_STRING = ADDON.getLocalizedString
 INPUTSTREAM_ENABLED = str(ADDON.getSetting(id="inputstream_adaptive"))
+CONTINUOUS_RANDOM = str(ADDON.getSetting(id="continuous_random"))
 
 RESOURCE_ID = "<rss version='2.0'><channel><title>fx</title></channel></rss>"
 UA_FX = 'FXNOW/562 CFNetwork/711.4.6 Darwin/14.0.0'

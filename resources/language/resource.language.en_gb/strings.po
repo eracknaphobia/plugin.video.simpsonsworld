@@ -29,7 +29,7 @@ msgid "Comedy"
 msgstr ""
 
 msgctxt "#30010"
-msgid "Screen Ratio"
+msgid "Preferred Screen Ratio"
 msgstr ""
 
 msgctxt "#30011"
@@ -48,6 +48,10 @@ msgctxt "#30030"
 msgid "Use Inputstream Adaptive"
 msgstr ""
 
+msgctxt "#30040"
+msgid "Continuous Random Episode"
+msgstr ""
+
 msgctxt "#30900"
 msgid "Deauthorizie Device"
 msgstr ""
@@ -63,3 +67,6 @@ msgstr ""
 msgctxt "#30911"
 msgid "Device Not Authorized"
 msgstr ""
+
+
+
