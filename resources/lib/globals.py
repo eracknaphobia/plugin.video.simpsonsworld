@@ -86,6 +86,10 @@ def list_seasons():
 def random_episode():
     # Get a random season
     season = random.randint(min_season, max_season)
+
+    if season == 29:
+        random_episode()
+
     url = "http://fapi2.fxnetworks.com/androidtv/videos?filter%5Bfapi_show_id%5D=9aad7da1-093f-40f5-b371-fec4122f0d86" \
           "&filter%5Bseason%5D=" + str(season) + "&limit=500&filter%5Btype%5D=episode"
 
