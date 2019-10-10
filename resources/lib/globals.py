@@ -64,7 +64,8 @@ season_art = {'1': '71663-1-16.jpg',
               '27': '71663-27-2.jpg',
               '28': '5bb0705e47a0a.jpg',
               '29': '5bb06fe5bf4af.jpg',
-              '30': '5bb070d688a18.jpg'
+              '30': '5bb070d688a18.jpg',
+              '31': '5d9223869cd72.jpg'
               }
 
 min_season = 1
@@ -86,9 +87,6 @@ def list_seasons():
 def random_episode():
     # Get a random season
     season = random.randint(min_season, max_season)
-
-    if season == 29:
-        random_episode()
 
     url = "http://fapi2.fxnetworks.com/androidtv/videos?filter%5Bfapi_show_id%5D=9aad7da1-093f-40f5-b371-fec4122f0d86" \
           "&filter%5Bseason%5D=" + str(season) + "&limit=500&filter%5Btype%5D=episode"
