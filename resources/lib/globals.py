@@ -77,7 +77,7 @@ def list_seasons():
     add_episode("Random[CR]Episode", str(0), "Random[CR]Episode",
                 'https://www.thetvdb.com/banners/posters/71663-32.jpg', FANART, None, 103, properties)
 
-    for x in range(min_season, max_season):
+    for x in range(min_season, max_season+1):
         title = "Season " + str(x)
         url = str(x)
         icon = art_root + season_art[str(x)]

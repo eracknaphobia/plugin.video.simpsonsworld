@@ -18,7 +18,7 @@
     </news>
     <language>en</language>
     <platform>all</platform>
-    <license>GNU GENERAL PUBLIC LICENSE. Version 2, June 1991</license>
+    <license>GPL-2.0-or-later</license>
     <forum>http://forum.kodi.tv/showthread.php?tid=310272</forum>    
     <source>https://github.com/eracknaphobia/plugin.video.simpsonsworld</source>
     <assets>
